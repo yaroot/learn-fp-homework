@@ -12,7 +12,7 @@ object WriterInstance {
       Writer(() => {
         val (wa, ra) = a.run()
         val (wb, rb) = fx(ra).run()
-        (a.monoid.mappend(wa, wb), rb)
+        (wa |+| wb, rb)
       })(a.monoid)
     }
   }
