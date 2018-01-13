@@ -10,27 +10,40 @@ trait Foldable[C[_]] {
 
 object FoldableInstances {
   implicit def idFoldable = new Foldable[Id] {
-    override def foldr[A, B](xs: Id[A])(init: B)(fx: (A, B) => B): B = ???
+    override def foldr[A, B](xs: Id[A])(init: B)(fx: (A, B) => B): B = fx(xs.value, init)
   }
 
   implicit def listFoldable = new Foldable[List] {
-    override def foldr[A, B](xs: List[A])(init: B)(fx: (A, B) => B): B = ???
+    override def foldr[A, B](xs: List[A])(init: B)(fx: (A, B) => B): B = xs.foldRight(init)(fx)
   }
 
   implicit def tuple2Foldable = new Foldable[({type E[X] = Tuple2[X, X]})#E] {
-    override def foldr[A, B](xs: (A, A))(init: B)(fx: (A, B) => B): B = ???
+    override def foldr[A, B](xs: (A, A))(init: B)(fx: (A, B) => B): B = fx(xs._1, fx(xs._2, init))
   }
 
   implicit def tuple3Foldable = new Foldable[({type E[X] = (X, X, X)})#E] {
-    override def foldr[A, B](xs: (A, A, A))(init: B)(fx: (A, B) => B): B = ???
+    override def foldr[A, B](xs: (A, A, A))(init: B)(fx: (A, B) => B): B = {
+      val (a, b, c) = xs
+      fx(a, fx(b, fx(c, init)))
+    }
   }
 
   implicit val maybeFoldable = new Foldable[Maybe] {
-    override def foldr[A, B](xs: Maybe[A])(init: B)(fx: (A, B) => B): B = ???
+    override def foldr[A, B](xs: Maybe[A])(init: B)(fx: (A, B) => B): B = {
+      xs match {
+        case Just(a) => fx(a, init)
+        case Nothing() => init
+      }
+    }
   }
 
   implicit def disjunctionFoldable[L] = new Foldable[({type E[X] = Disjunction[L, X]})#E] {
-    override def foldr[A, B](xs: Disjunction[L, A])(init: B)(fx: (A, B) => B): B = ???
+    override def foldr[A, B](xs: Disjunction[L, A])(init: B)(fx: (A, B) => B): B = {
+      xs match {
+        case LeftDisjunction(l) => init
+        case RightDisjunction(r) => fx(r, init)
+      }
+    }
   }
 }
 
