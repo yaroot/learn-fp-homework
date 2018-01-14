@@ -22,7 +22,7 @@ object EqInstances {
   }
 
   implicit val stringEqInstance = new Eq[String] {
-    override def eq(lhs: String, rhs: String): Boolean = ???
+    override def eq(lhs: String, rhs: String): Boolean = lhs == rhs
   }
 
   implicit def listEqInstance[A](implicit eqt:Eq[A]) = new Eq[List[A]] {

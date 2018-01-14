@@ -21,14 +21,14 @@ class TransformerStackTest extends WordSpecLike with Matchers {
       {
         for {
           x <- 10.pure[App]
-          // TODO: tell "een"
-          // TODO: put state "one"
+          _ <- StateT.lift[String, OuterT, Unit](WriterT.tell[Maybe, List[String]](List("een")))
+          _ <- StateT.putT[String, OuterT]("one")
           y <- 20.pure[App]
-          // TODO: tell "twee"
-          // TODO: put state "two"
+          _ <- StateT.lift[String, OuterT, Unit](WriterT.tell[Maybe, List[String]](List("twee")))
+          _ <- StateT.putT[String, OuterT]("two")
           z <- 30.pure[App]
-          // TODO: tell "drie"
-          // TODO: put state "three"
+          _ <- StateT.lift[String, OuterT, Unit](WriterT.tell[Maybe, List[String]](List("drie")))
+          _ <- StateT.putT[String, OuterT]("three")
         } yield x
       }.runStateT("null").runWriterT() match {
         case Just(v) => v shouldBe (List("een", "twee", "drie"), ("three", 10))
